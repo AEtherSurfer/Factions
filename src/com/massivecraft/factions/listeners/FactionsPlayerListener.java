@@ -136,7 +136,7 @@ public class FactionsPlayerListener implements Listener
 		{
 			me.attemptClaim(me.getAutoClaimFor(), event.getTo(), true);
 		}
-		// if enemy, is corner, and host is weak => revert plot
+		// if enemy, is corner, and host is weak => revert location back to wilderness
 		else if (Rel.ENEMY == me.getRelationTo(access.getHostFaction()) &&
 				Board.isCornerLocation(to) &&
 				hostFaction.hasLandInflation())
