@@ -53,6 +53,11 @@ public class CmdClaim extends FCommand
 		}
 		else
 		{
+			if (forFaction.getLandRounded() >= forFaction.getPowerRounded())
+			{
+				fme.msg("<b>You can't claim more land! You need more power!");
+				return;
+			}
 			// radius claim
 			new SpiralTask(new FLocation(me), radius)
 			{
@@ -62,13 +67,16 @@ public class CmdClaim extends FCommand
 				@Override
 				public boolean work()
 				{
-					boolean success = fme.attemptClaim(forFaction, this.currentLocation(), true);
+					boolean success = fme.attemptClaim(forFaction, this.currentLocation(), false);
 					if (success)
 						failCount = 0;
-					else if ( ! success && failCount++ >= limit)
+					else if ( ! success)
 					{
-						this.stop();
-						return false;
+						if (failCount++ >= limit || forFaction.getLandRounded() >= forFaction.getPowerRounded())
+						{
+							this.stop();
+							return false;
+						}
 					}
 
 					return true;
