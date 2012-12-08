@@ -263,7 +263,7 @@ public class Factions extends EntityCollection<Faction>
 
 	public void econLandRewardRoutine()
 	{
-		P.p.log("Running econLandRewardRoutine...");
+		P.p.log(Level.FINE, "Running econLandRewardRoutine...");
 		for (Faction faction : this.get())
 		{
 			int landCount = faction.getLandRounded();
@@ -271,10 +271,13 @@ public class Factions extends EntityCollection<Faction>
 			{
 				Set<FPlayer> players = faction.getFPlayers();
 				int playerCount = players.size();
-				double reward = Conf.econLandReward * landCount / playerCount;
-				for (FPlayer player : players)
+				if (playerCount > 0)
 				{
-					Econ.modifyMoney(player, reward, "to own faction land", "for faction owning " + landCount + " land divided among " + playerCount + " member(s)");
+					double reward = Conf.econLandReward * landCount / playerCount;
+					for (FPlayer player : players)
+					{
+						Econ.modifyMoney(player, reward, "to own faction land", "for faction owning " + landCount + " land divided among " + playerCount + " member(s)");
+					}
 				}
 			}
 		}
