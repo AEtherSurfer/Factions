@@ -652,7 +652,12 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator
 
 		LandClaimEvent claimEvent = new LandClaimEvent(flocation, forFaction, this);
 		Bukkit.getServer().getPluginManager().callEvent(claimEvent);
-		if(claimEvent.isCancelled()) return false;
+		if(claimEvent.isCancelled())
+		{
+			if (notifyFailure)
+				msg("<b>Claim cancelled by plugin.");
+			return false;
+		}
 
 		// then make 'em pay (if applicable)
 		if (mustPay && ! Econ.modifyMoney(payee, -cost, "to claim this land", "for claiming this land")) return false;
