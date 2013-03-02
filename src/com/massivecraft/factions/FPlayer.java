@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import com.massivecraft.factions.event.FPlayerLeaveEvent;
 import com.massivecraft.factions.event.LandClaimEvent;
 import com.massivecraft.factions.iface.EconomyParticipator;
+import static com.massivecraft.factions.iface.FClaimChecker.ClaimResult;
 import com.massivecraft.factions.iface.RelationParticipator;
 import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.integration.LWCFeatures;
@@ -535,101 +536,21 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator
 		}
 	}
 
-	public boolean canClaimForFactionAtLocation(Faction forFaction, Location location, boolean notifyFailure)
-	{
-		String error = null;
+	public boolean attemptClaim(Faction forFaction, Location location, boolean notifyFailure)
+	{	
 		FLocation flocation = new FLocation(location);
-		Faction myFaction = getFaction();
 		Faction currentFaction = Board.getFactionAt(flocation);
 		int ownedLand = forFaction.getLandRounded();
 		
-		if (Conf.worldGuardChecking && Worldguard.checkForRegionsInChunk(location))
+		ClaimResult result = P.p.claimChecker.checkClaim(this, forFaction, currentFaction, location);
+		// Move down message for success below bukkit event
+		if (!result.isAllowed())
 		{
-			// Checks for WorldGuard regions in the chunk attempting to be claimed
-			error = P.p.txt.parse("<b>This land is protected");
-		}
-		else if (Conf.worldsNoClaiming.contains(flocation.getWorldName()))
-		{
-			error = P.p.txt.parse("<b>Sorry, this world has land claiming disabled.");
-		}
-		else if (this.hasAdminMode())
-		{
-			return true;
-		}
-		else if (forFaction == currentFaction)
-		{
-			error = P.p.txt.parse("%s<i> already own this land.", forFaction.describeTo(this, true));
-		}
-		else if ( ! FPerm.TERRITORY.has(this, forFaction, true))
-		{
+			if (notifyFailure && (!result.getMessage().isEmpty()))
+				msg(result.getMessage());
 			return false;
 		}
-		else if (forFaction.getFPlayers().size() < Conf.claimsRequireMinFactionMembers)
-		{
-			error = P.p.txt.parse("Factions must have at least <h>%s<b> members to claim land.", Conf.claimsRequireMinFactionMembers);
-		}
-		else if (ownedLand >= forFaction.getPowerRounded())
-		{
-			error = P.p.txt.parse("<b>You can't claim more land! You need more power!");
-		}
-		else if (Conf.claimedLandsMax != 0 && ownedLand >= Conf.claimedLandsMax && ! forFaction.getFlag(FFlag.INFPOWER))
-		{
-			error = P.p.txt.parse("<b>Limit reached. You can't claim more land!");
-		}
-		else if ( ! Conf.claimingFromOthersAllowed && currentFaction.isNormal())
-		{
-			error = P.p.txt.parse("<b>You may not claim land from others.");
-		}
-		else if (currentFaction.getRelationTo(forFaction).isAtLeast(Rel.TRUCE) && ! currentFaction.isNone())
-		{
-			error = P.p.txt.parse("<b>You can't claim this land due to your relation with the current owner.");
-		}
-		else if
-		(
-			Conf.claimsMustBeConnected
-			&& ! this.hasAdminMode()
-			&& myFaction.getLandRoundedInWorld(flocation.getWorldName()) > 0
-			&& !Board.isConnectedLocation(flocation, myFaction)
-			&& (!Conf.claimsCanBeUnconnectedIfOwnedByOtherFaction || !currentFaction.isNormal())
-		)
-		{
-			if (Conf.claimsCanBeUnconnectedIfOwnedByOtherFaction)
-				error = P.p.txt.parse("<b>You can only claim additional land which is connected to your first claim or controlled by another faction!");
-			else
-				error = P.p.txt.parse("<b>You can only claim additional land which is connected to your first claim!");
-		}
-		else if (currentFaction.isNormal())
-		{
-			if ( ! currentFaction.hasLandInflation())
-			{
-				 // TODO more messages WARN current faction most importantly
-				error = P.p.txt.parse("%s<i> owns this land and is strong enough to keep it.", currentFaction.getTag(this));
-			}
-			else if ( ! Board.isBorderLocation(flocation))
-			{
-				error = P.p.txt.parse("<b>You must start claiming land at the border of the territory.");
-			}
-		}
-		
-		if (notifyFailure && error != null)
-		{
-			msg(error);
-		}
-		return error == null;
-	}
-	
-	public boolean attemptClaim(Faction forFaction, Location location, boolean notifyFailure)
-	{
-		// notifyFailure is false if called by auto-claim; no need to notify on every failure for it
-		// return value is false on failure, true on success
-		
-		FLocation flocation = new FLocation(location);
-		Faction currentFaction = Board.getFactionAt(flocation);
-		
-		int ownedLand = forFaction.getLandRounded();
-		
-		if ( ! this.canClaimForFactionAtLocation(forFaction, location, notifyFailure)) return false;
-		
+
 		// TODO: Add flag no costs??
 		// if economy is enabled and they're not on the bypass list, make sure they can pay
 		boolean mustPay = Econ.shouldBeUsed() && ! this.hasAdminMode();
@@ -665,7 +586,13 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator
 		if (LWCFeatures.getEnabled() && forFaction.isNormal() && Conf.onCaptureResetLwcLocks)
 			LWCFeatures.clearOtherChests(flocation, this.getFaction());
 
-		// announce success
+		/// Announce success
+		// announce to player
+		if (!result.getMessage().isEmpty())
+		{
+			msg(result.getMessage());
+		}
+		// announce to player's faction
 		Set<FPlayer> informTheseFPlayers = new HashSet<FPlayer>();
 		informTheseFPlayers.add(this);
 		informTheseFPlayers.addAll(forFaction.getFPlayersWhereOnline(true));
@@ -673,7 +600,16 @@ public class FPlayer extends PlayerEntity implements EconomyParticipator
 		{
 			fp.msg("<h>%s<i> claimed land for <h>%s<i> from <h>%s<i>.", this.describeTo(fp, true), forFaction.describeTo(fp), currentFaction.describeTo(fp));
 		}
-		
+		// announce to enemy's faction
+		if (currentFaction.isNormal() && Conf.claimingFromOthersNotifies)
+		{
+			Set<FPlayer> informTheseEnemyPlayers = new HashSet<FPlayer>();
+			informTheseEnemyPlayers.addAll(currentFaction.getFPlayersWhereOnline(true));
+			for (FPlayer fp : informTheseEnemyPlayers)
+			{
+				fp.msg("<h>%s<i> claimed land for <h>%s<i> from your faction at <h>(%s, %s)<i>.", this.describeTo(fp, true), forFaction.describeTo(fp), Long.toString(flocation.getX()), Long.toString(flocation.getZ()));
+			}
+		}
 		Board.setFactionAt(forFaction, flocation);
 		SpoutFeatures.updateTerritoryDisplayLoc(flocation);
 

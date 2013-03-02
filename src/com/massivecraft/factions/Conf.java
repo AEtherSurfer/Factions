@@ -153,6 +153,7 @@ public class Conf
 	
 	public static boolean claimsMustBeConnected = false;
 	public static boolean claimingFromOthersAllowed = true;
+	public static boolean claimingFromOthersNotifies = true;
 	public static boolean claimsCanBeUnconnectedIfOwnedByOtherFaction = true;
 	public static int claimsRequireMinFactionMembers = 1;
 	public static int claimedLandsMax = 0;

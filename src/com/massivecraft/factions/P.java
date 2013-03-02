@@ -17,7 +17,9 @@ import com.massivecraft.factions.adapters.FFlagTypeAdapter;
 import com.massivecraft.factions.adapters.FPermTypeAdapter;
 import com.massivecraft.factions.adapters.LocationTypeAdapter;
 import com.massivecraft.factions.adapters.RelTypeAdapter;
+import com.massivecraft.factions.claims.DefaultClaimChecker;
 import com.massivecraft.factions.cmd.*;
+import com.massivecraft.factions.iface.FClaimChecker;
 import com.massivecraft.factions.integration.capi.CapiFeatures;
 import com.massivecraft.factions.integration.herochat.HerochatFeatures;
 import com.massivecraft.factions.integration.Econ;
@@ -71,6 +73,9 @@ public class P extends MPlugin
 	public FCmdRoot cmdBase;
 	public CmdAutoHelp cmdAutoHelp;
 	
+	// Changeable Behavior
+	public FClaimChecker claimChecker = new DefaultClaimChecker();
+
 	public P()
 	{
 		p = this;
@@ -369,5 +374,16 @@ public class P extends MPlugin
 	public boolean isPlayerAllowedToUseThisHere(Player player, Location location, Material material)
 	{
 		return FactionsPlayerListener.playerCanUseItemHere(player, location, material, true);
+	}
+
+	/**
+	 * Change the currently used FClaimChecker.
+	 * <p />
+	 * This function is intended for use by extension plugins that modify the behaviors of Factions.
+	 * @param newchecker
+	 */
+	public void setNewClaimChecker(FClaimChecker newchecker)
+	{
+		this.claimChecker = newchecker;
 	}
 }
