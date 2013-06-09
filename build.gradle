@@ -36,7 +36,8 @@ sourceSets {
 			srcDir 'src'
 		}
 		resources {
-			file 'plugin.yml'
+			srcDir "$projectDir"
+			include 'plugin.yml'
 		}
 	}
 }
