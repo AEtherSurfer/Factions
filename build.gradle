@@ -3,33 +3,48 @@ import org.apache.tools.ant.filters.ReplaceTokens
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-group = "com.aethercraft"
-version = "0.0.1-SNAPSHOT"
+group = "com.massivecraft"
+version = "1.8.2-SNAPSHOT"
 
-sourceCompatibility = 1.6
+sourceCompatibility = 1.7
 
 repositories {
+	mavenLocal()
     mavenCentral()
 	maven {
 		url "http://repo.bukkit.org/content/groups/public"
 	}
+	maven {
+		url "http://ci.herocraftonline.com/plugin/repository/everything"
+    }
 }
 
 dependencies {
-//	compile 'javax.servlet:servlet-api:2.4'
 	compile 'org.bukkit:bukkit:1.5.2-R0.2-SNAPSHOT'
+	compile('com.massivecraft:mcore:6.3.1-SNAPSHOT') {
+		exclude module: 'ProtocolLib'
+		exclude module: 'Privileges'
+		exclude module: 'craftconomy3'
+		exclude module: 'SDFEconomy'
+	}
+    compile fileTree(dir: 'lib', include: '*.jar')
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+		resources {
+			file 'plugin.yml'
+		}
+	}
 }
 
 processResources  {
 	filter ReplaceTokens, tokens: [
 		version: project.version,
 	]
-}
-
-//include dependencies for a "fat jar"
-//http://docs.codehaus.org/display/GRADLE/Cookbook#Cookbook-Creatingafatjar
-jar {
-	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 task wrapper(type: Wrapper) {
