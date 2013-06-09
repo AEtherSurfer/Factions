@@ -22,10 +22,9 @@ import com.dthielke.herochat.Herochat;
 import com.dthielke.herochat.MessageFormatSupplier;
 import com.dthielke.herochat.MessageNotFoundException;
 import com.dthielke.herochat.util.Messaging;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.FPlayers;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.struct.Rel;
+import com.massivecraft.factions.Rel;
+import com.massivecraft.factions.entity.UPlayer;
+import com.massivecraft.factions.entity.Faction;
 
 public abstract class FactionsChannelAbstract implements Channel
 {
@@ -206,28 +205,26 @@ public abstract class FactionsChannelAbstract implements Channel
 		return this.getMutes().contains(name.toLowerCase());
 	}
 	
-	
 	public abstract Set<Rel> getTargetRelations();
 	
 	public Set<Player> getRecipients(Player sender)
 	{
 		Set<Player> ret = new HashSet<Player>();
 		
-		FPlayer fpsender = FPlayers.i.get(sender);
-		Faction faction = fpsender.getFaction();		
-		ret.addAll(faction.getOnlinePlayers());
+		UPlayer fpsender = UPlayer.get(sender);
+		Faction faction = fpsender.getFaction();
+		String universe = fpsender.getUniverse();
 		
-		for (FPlayer fplayer : FPlayers.i.getOnline())
+		for (Player player : Bukkit.getOnlinePlayers())
 		{
-			if(this.getTargetRelations().contains(faction.getRelationTo(fplayer)))
-			{
-				ret.add(fplayer.getPlayer());
-			}
+			UPlayer frecipient = UPlayer.get(player);
+			if (!frecipient.getUniverse().equals(universe)) continue;
+			if (!this.getTargetRelations().contains(faction.getRelationTo(frecipient))) continue;
+			ret.add(player);
 		}
 		
 		return ret;
 	}
-	
 	
 	@Override
 	public void processChat(ChannelChatEvent event)
@@ -266,65 +263,6 @@ public abstract class FactionsChannelAbstract implements Channel
 
 		Herochat.logChat(msg);
 	}
-	
-	/*@Override
-	public void processChat(ChannelChatEvent event)
-	{
-		final Player player = event.getSender().getPlayer();
-
-		String format = applyFormat(event.getFormat(), event.getBukkitFormat(), player);
-
-		Chatter sender = Herochat.getChatterManager().getChatter(player);
-		Set<Player> recipients = new HashSet<Player>(Arrays.asList(Bukkit.getOnlinePlayers()));
-
-		trimRecipients(recipients, sender);
-		if (!isMessageHeard(recipients, sender))
-		{
-			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Herochat.getPlugin(), new Runnable()
-			{
-				public void run()
-				{
-					try
-					{
-						Messaging.send(player, Herochat.getMessage("channel_alone"));
-					}
-					catch (MessageNotFoundException e)
-					{
-						Herochat.severe("Messages.properties is missing: channel_alone");
-					}
-				}
-			}, 1L);
-		}
-		
-		FPlayer fplayer = FPlayers.i.get(player);
-		
-		String formatWithoutColor = FactionsChatListener.parseTags(format, player, fplayer);
-		
-		//String msg = String.format(format, player.getDisplayName(), event.getMessage());
-		
-
-		for (Player recipient : recipients)
-		{
-			String finalFormat;
-			if ( ! Conf.chatParseTags || Conf.chatTagHandledByAnotherPlugin)
-			{
-				finalFormat = format;
-			}
-			else if (! Conf.chatParseTagsColored)
-			{
-				finalFormat = formatWithoutColor;
-			}
-			else
-			{
-				FPlayer frecipient = FPlayers.i.get(recipient);
-				finalFormat = FactionsChatListener.parseTags(format, player, fplayer, recipient, frecipient);
-			}
-			String msg = String.format(finalFormat, player.getDisplayName(), event.getMessage());
-			recipient.sendMessage(msg);
-		}
-
-		Herochat.logChat(String.format(formatWithoutColor, player.getDisplayName(), event.getMessage()));
-	}*/
 	
 	public boolean isMessageHeard(Set<Player> recipients, Chatter sender)
 	{
