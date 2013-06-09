@@ -1,0 +1,37 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+group = "com.aethercraft"
+version = "0.0.1-SNAPSHOT"
+
+sourceCompatibility = 1.6
+
+repositories {
+    mavenCentral()
+	maven {
+		url "http://repo.bukkit.org/content/groups/public"
+	}
+}
+
+dependencies {
+//	compile 'javax.servlet:servlet-api:2.4'
+	compile 'org.bukkit:bukkit:1.5.2-R0.2-SNAPSHOT'
+}
+
+processResources  {
+	filter ReplaceTokens, tokens: [
+		version: project.version,
+	]
+}
+
+//include dependencies for a "fat jar"
+//http://docs.codehaus.org/display/GRADLE/Cookbook#Cookbook-Creatingafatjar
+jar {
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '1.6'
+}
