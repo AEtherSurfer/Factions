@@ -4,7 +4,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 
 group = "com.massivecraft"
-version = "1.8.2-SNAPSHOT"
+version = "2.0.0"
 
 sourceCompatibility = 1.7
 
