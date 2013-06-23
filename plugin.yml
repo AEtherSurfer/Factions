@@ -1,6 +1,6 @@
 main: com.massivecraft.factions.Factions
 name: Factions
-version: 2.0.0_dev
+version: 2.0.0
 website: http://massivecraft.com/factions
 authors: [Cayorion, Brettflan]
 description: §eFactions allows the players to team up and claim land as their own and start wars with other factions. This way we hope to inspire politics, intrigue, and team spirit. §aCayorion §efrom the minecraft server §aMassiveCraft §eis the lead Factions programmer. Feel free to visit us at §bhttp://massivecraft.com
@@ -23,7 +23,7 @@ permissions:
   factions.description: {description: change faction description, default: false}
   factions.disband: {description: disband faction, default: false}
   factions.faction: {description: show faction information, default: false}
-  factions.flag: {description: read faction flags, default: false}
+  factions.flag: {description: manage faction flags, default: false}
   factions.flag.set: {description: set faction flags, default: false}
   factions.home: {description: teleport to faction home, default: false}
   factions.invite: {description: set if player is invited, default: false}

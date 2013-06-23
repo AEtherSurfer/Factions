@@ -29,7 +29,9 @@ public class PlayerRoleComparator implements Comparator<UPlayer>
 		if (ret != 0) return ret;
 		
 		// Rank
-		return o2.getRole().getValue() - o1.getRole().getValue();
+		Rel r1 = o1.getRole();
+		Rel r2 = o2.getRole();
+		return r2.getValue() - r1.getValue();
 	}
 
 }
