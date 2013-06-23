@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-	compile 'org.bukkit:bukkit:1.5.2-R0.2-SNAPSHOT'
+	compile 'org.bukkit:bukkit:1.5.2-R1.1-SNAPSHOT'
 	compile('com.massivecraft:mcore:6.4.1-SNAPSHOT') {
 		exclude module: 'ProtocolLib'
 		exclude module: 'Privileges'
