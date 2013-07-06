@@ -4,4 +4,4 @@ jdk:
 before_install:
   - git clone https://github.com/AEtherSurfer/MCore.git
   - cd MCore
-  - ./gradlew install
+  - gradle install
