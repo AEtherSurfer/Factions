@@ -115,6 +115,7 @@ public class UConf extends Entity<UConf>
 	public int claimsRequireMinFactionMembers = 1;
 	public int claimedLandsMax = 0;
 	
+	public boolean claimsEnemyPresenceReverts = true;
 	public String claimsBorderAlgoName = "ORIGINAL";
 	public Board.BorderAlgo claimsBorderAlgo = Board.BorderAlgo.valueOf(claimsBorderAlgoName);
 
@@ -215,6 +216,8 @@ public class UConf extends Entity<UConf>
 	public double econCostDescription = 0.0;
 	public double econCostTitle = 0.0;
 	public double econCostOpen = 0.0;
+
+	public double econEnemyRevertAward = 0.0;
 	
 	public Map<Rel, Double> econRelCost = MUtil.map(
 		Rel.ENEMY, 0.0,
