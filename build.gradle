@@ -23,8 +23,8 @@ repositories {
 }
 
 dependencies {
-	compile 'org.bukkit:bukkit:1.5.2-R1.1-SNAPSHOT'
-	compile('com.massivecraft:mcore:6.4.1-SNAPSHOT') {
+	compile 'org.bukkit:bukkit:1.6.1-R0.1-SNAPSHOT'
+	compile('com.massivecraft:MCore:6.4.3AES-SNAPSHOT') {
 		exclude module: 'ProtocolLib'
 		exclude module: 'Privileges'
 		exclude module: 'craftconomy3'
