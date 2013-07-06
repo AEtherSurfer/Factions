@@ -7,7 +7,7 @@ apply plugin: 'maven'
 apply plugin: 'eclipse'
 
 group = "com.massivecraft"
-version = "2.0.0AES-SNAPSHOT"
+version = "2.0.2AES-SNAPSHOT"
 
 sourceCompatibility = 1.7
 
