@@ -7,7 +7,7 @@ apply plugin: 'maven'
 apply plugin: 'eclipse'
 
 group = "com.massivecraft"
-version = "2.0.2AES-SNAPSHOT"
+version = "2.0.3AES-SNAPSHOT"
 
 sourceCompatibility = 1.7
 
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-	compile 'org.bukkit:bukkit:1.6.1-R0.1-SNAPSHOT'
+	compile 'org.bukkit:bukkit:1.6.2-R0.1-SNAPSHOT'
 	compile('com.massivecraft:MCore:6.4.3AES-SNAPSHOT') {
 		exclude module: 'ProtocolLib'
 		exclude module: 'Privileges'
