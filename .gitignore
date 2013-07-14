@@ -7,6 +7,11 @@
 /nbproject
 /build.xml
 
+# idea
+*.iml
+*.ipr
+*.iws
+
 # vim
 .*.sw[a-p]
 

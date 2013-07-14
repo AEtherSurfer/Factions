@@ -5,6 +5,7 @@ ext {
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 
 group = "com.massivecraft"
 version = "2.0.3AES-SNAPSHOT"
