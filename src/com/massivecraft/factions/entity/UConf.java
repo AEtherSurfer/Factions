@@ -115,7 +115,7 @@ public class UConf extends Entity<UConf>
 	public int claimedLandsMax = 0;
 	
 	public boolean claimsEnemyPresenceReverts = true;
-	public BorderAlgo claimsBorderAlgo = BorderAlgo.ORIGINAL;
+	public BorderAlgo claimsBorderAlgo = BorderAlgo.SURROUND_FIVE;
 
 	// -------------------------------------------- //
 	// HOMES

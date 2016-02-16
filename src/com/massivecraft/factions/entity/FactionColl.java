@@ -15,6 +15,7 @@ import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.Rel;
 import com.massivecraft.factions.integration.Econ;
 import com.massivecraft.factions.util.MiscUtil;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class FactionColl extends Coll<Faction>
 {
@@ -188,22 +189,31 @@ public class FactionColl extends Coll<Faction>
 		
 		double econLandReward = UConf.get(this).econLandReward;
 		if (econLandReward == 0.0) return;
-		
-		Factions.get().log("Running econLandRewardRoutine...");
+        long start = System.nanoTime();
+        Factions plugin = Factions.get();
+        plugin.log("econLandRewardRoutine running...");
+        long count = 1;
 		for (Faction faction : this.getAll())
 		{
-			int landCount = faction.getLandCount();
+			final int landCount = faction.getLandCount();
 			if (!faction.getFlag(FFlag.PEACEFUL) && landCount > 0)
 			{
 				List<UPlayer> players = faction.getUPlayers();
-				int playerCount = players.size();
-				double reward = econLandReward * landCount / playerCount;
-				for (UPlayer player : players)
+				final int playerCount = players.size();
+				final double reward = econLandReward * landCount / playerCount;
+				for (final UPlayer player : players)
 				{
-					Econ.modifyMoney(player, reward, "own " + landCount + " faction land divided among " + playerCount + " members");
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            Econ.modifyMoney(player, reward, "own " + landCount + " faction land divided among " + playerCount + " members");
+                        }
+                    }.runTaskLater(plugin, count * 5);
+                    count++;
 				}
 			}
 		}
+        plugin.log("econLandRewardRoutine took " + (System.nanoTime() - start) / 1000000000.0 + "s for " + count + " players");
 	}
 	
 	// -------------------------------------------- //
